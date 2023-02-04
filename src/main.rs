@@ -61,11 +61,6 @@ fn main() {
     let template = format!("{}/{}/", config.template_dir, &args[1]);
     let target = &args[2];
 
-    println!(
-        "template: {template}, target: {target}, template_dir: {}",
-        config.template_dir
-    );
-
     if !Path::new(target).exists() {
         println!("{target} does not exist. Creating...");
         fs::create_dir_all(target).unwrap();
