@@ -2,12 +2,13 @@ name: publish
 
 on:
   pull_request:
-    - closed
+    types:
+      - closed
 
 
 jobs:
-  runs-on: ubuntu:latest
   publish:
+    runs-on: ubuntu-latest
     if: github.event.pull_request.merged == true
     steps:
       - name: Checkout
