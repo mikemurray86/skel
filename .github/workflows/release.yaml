@@ -12,6 +12,10 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v3
+      - name: Install Task
+        uses: arduino/setup-task@v1
+      - name: build
+        run: task build
       - uses: ncipollo/release-action@v1
         with:
           artifacts: "target/release/skel"
