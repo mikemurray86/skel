@@ -1,0 +1,20 @@
+name: publish
+
+on:
+  pull_request:
+    - closed
+
+
+jobs:
+  runs-on: ubuntu:latest
+  publish:
+    if: github.event.pull_request.merged == true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Install Task
+        uses: arduino/setup-task@v1
+      - name: build
+        run: task build
+
+

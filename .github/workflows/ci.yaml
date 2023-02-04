@@ -1,0 +1,22 @@
+name: ci
+
+on:
+  push:
+
+
+jobs:
+  runs-on: ubuntu:latest
+  ci:
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Install Task
+        uses: arduino/setup-task@v1
+      - name: Setup
+        run: task setup
+      - name: Lint
+        run: task lint
+      - name: Test
+        run: task test
+      - name: Security Checks
+        run: task security:check

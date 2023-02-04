@@ -1,0 +1,44 @@
+version: '3'
+
+tasks:
+
+  default:
+    cmds:
+      - task: setup
+      - task: lint
+      - task: security:check
+      - task: test
+
+  setup:
+    desc: "install needed components"
+    cmds:
+      - echo "installing rust..."
+      - curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable --profile default
+      - echo "installing cargo components"
+      - cargo install cargo-audit
+    status:
+      - which cargo
+      - test -f $HOME/.cargo/bin/cargo-audit
+
+  lint:
+    desc: "run linting jobs"
+    cmds:
+      - cargo check
+      - cargo fmt --check
+      - cargo clippy
+
+  security:check:
+    desc: "run security checks"
+    cmds:
+      - echo "running security checks"
+      - cargo audit
+
+  test:
+    desc: "run tests"
+    cmds:
+      - cargo test
+
+  build:
+    desc: "build the binary"
+    cmds:
+      - cargo build --release
