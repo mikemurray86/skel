@@ -37,6 +37,7 @@ fn get_config_path() -> OsString {
     env::var_os("SKEL_CONFIG").unwrap_or(config_dir)
 }
 
+/// Returns a Config struct representing options defined for the application
 pub fn get_config() -> Config {
     let config: Config = Figment::new()
         .merge(Yaml::file(get_config_path()))
@@ -48,6 +49,8 @@ pub fn get_config() -> Config {
     config
 }
 
+/// Reads files from `template` and copies it into `target`
+/// if the `target` does not exist it will be created for you
 pub fn use_template(template: &str, target: &str) {
     if !Path::new(target).exists() {
         println!("{target} does not exist. Creating...");
