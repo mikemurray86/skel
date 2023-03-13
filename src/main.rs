@@ -7,7 +7,7 @@
 //! folder containing it.
 
 use clap::Parser;
-use skel::{get_config, use_template};
+use skel::{get_config, save_template, use_template};
 mod cli;
 
 /// Main function that handles reading the config file for the template directory then
@@ -19,12 +19,12 @@ fn main() {
     match cli.command {
         cli::Commands::Use(args) => {
             let template = format!("{}/{}/", config.template_dir, args.template.as_str());
-            use_template(template.as_str(), args.target.as_str());
+            use_template(template.as_str(), args.target.as_str(), args.context_file);
         }
         cli::Commands::Save(args) => {
             let target = format!("{}/{}", config.template_dir, args.template.as_str());
             let template = format!("{}/", args.target.as_str());
-            use_template(template.as_str(), target.as_str());
+            save_template(template.as_str(), target.as_str());
         }
     }
     println!("Done!");

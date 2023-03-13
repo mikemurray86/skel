@@ -9,12 +9,22 @@ pub struct Cli {
 
 #[derive(Subcommand, Debug)]
 pub enum Commands {
-    Use(ArgsL),
-    Save(ArgsL),
+    Use(UseArgs),
+    Save(SaveArgs),
 }
 
 #[derive(Args, Debug)]
-pub struct ArgsL {
+pub struct UseArgs {
+    #[arg(short, long)]
+    pub template: String,
+    #[arg(short='T', long, default_value_t = String::from("./"))]
+    pub target: String,
+    #[arg(short, long)]
+    pub context_file: Option<Option<String>>,
+}
+
+#[derive(Args, Debug)]
+pub struct SaveArgs {
     #[arg(short, long)]
     pub template: String,
     #[arg(short='T', long, default_value_t = String::from("./"))]

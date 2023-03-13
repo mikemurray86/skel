@@ -10,6 +10,7 @@ use std::ffi::OsString;
 use std::fs;
 use std::io;
 use std::path::Path;
+use tera::{Tera, Context};
 
 #[derive(Deserialize)]
 pub struct Config {
@@ -51,7 +52,7 @@ pub fn get_config() -> Config {
 
 /// Reads files from `template` and copies it into `target`
 /// if the `target` does not exist it will be created for you
-pub fn use_template(template: &str, target: &str) {
+pub fn save_template(template: &str, target: &str) {
     if !Path::new(target).exists() {
         println!("{target} does not exist. Creating...");
         fs::create_dir_all(target).unwrap();
@@ -70,6 +71,35 @@ pub fn use_template(template: &str, target: &str) {
         dest.push("/");
         dest.push(file.as_os_str());
         fs::copy(src, dest).unwrap();
+    }
+}
+
+/// Reads files from `template` and copies it into `target`
+/// using the tera templating engine. Currently an empty context
+/// is passed into the render call.
+/// if the `target` does not exist it will be created for you
+pub fn use_template(template: &str, target: &str, context_file: Option<Option<String>>) {
+    if !Path::new(target).exists() {
+        println!("{target} does not exist. Creating...");
+        fs::create_dir_all(target).unwrap();
+    }
+
+    let tera = Tera::new(&format!("{template}/*")).expect("failed to initialize template engine");
+    let context = match context_file {
+        Some(path) => {
+            let f = fs::File::open(path.unwrap());
+            let obj: serde_json::Value = serde_json::from_reader(f.unwrap()).unwrap();
+            Context::from_serialize(&obj).unwrap()
+        }
+        None => tera::Context::new()
+    };
+
+    for entry in tera.get_template_names() {
+        let mut dest = OsString::from(&target);
+        dest.push(format!("/{}", entry));
+        let file = fs::File::create(dest).expect("failed to create file");
+
+        tera.render_to(&entry, &context, file).expect("failed to render");
     }
 }
 
