@@ -10,7 +10,7 @@ use std::ffi::OsString;
 use std::fs;
 use std::io;
 use std::path::Path;
-use tera::{Tera, Context};
+use tera::{Context, Tera};
 
 #[derive(Deserialize)]
 pub struct Config {
@@ -91,15 +91,16 @@ pub fn use_template(template: &str, target: &str, context_file: Option<Option<St
             let obj: serde_json::Value = serde_json::from_reader(f.unwrap()).unwrap();
             Context::from_serialize(&obj).unwrap()
         }
-        None => tera::Context::new()
+        None => tera::Context::new(),
     };
 
     for entry in tera.get_template_names() {
         let mut dest = OsString::from(&target);
-        dest.push(format!("/{}", entry));
+        dest.push(format!("/{entry}"));
         let file = fs::File::create(dest).expect("failed to create file");
 
-        tera.render_to(&entry, &context, file).expect("failed to render");
+        tera.render_to(entry, &context, file)
+            .expect("failed to render");
     }
 }
 
