@@ -51,11 +51,16 @@ pub fn get_config() -> Config {
 }
 
 /// Reads files from `template` and copies it into `target`
-/// if the `target` does not exist it will be created for you
+/// if the `target` or `template` does not exist it will be created for you
 pub fn save_template(template: &str, target: &str) {
-    if !Path::new(target).exists() {
+    if !Path::new(target).try_exists().unwrap() {
         println!("{target} does not exist. Creating...");
         fs::create_dir_all(target).unwrap();
+    }
+
+    if !Path::new(template).try_exists().unwrap() {
+        println!("{template} does not exist. Creating...");
+        fs::create_dir_all(template).unwrap();
     }
 
     let entries = fs::read_dir(template)
@@ -75,8 +80,8 @@ pub fn save_template(template: &str, target: &str) {
 }
 
 /// Reads files from `template` and copies it into `target`
-/// using the tera templating engine. Currently an empty context
-/// is passed into the render call.
+/// using the tera templating engine. An optional `context_file`
+/// can be passed in to feed additional values into the templates.
 /// if the `target` does not exist it will be created for you
 pub fn use_template(template: &str, target: &str, context_file: Option<Option<String>>) {
     if !Path::new(target).exists() {
