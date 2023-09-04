@@ -12,7 +12,7 @@ use std::io;
 use std::path::Path;
 use tera::{Context, Tera};
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Debug)]
 pub struct Config {
     pub template_dir: String,
 }
@@ -71,11 +71,19 @@ pub fn save_template(template: &str, target: &str) {
 
     for file in entries {
         let mut src = OsString::from(&template);
+        src.push("/");
         src.push(file.as_os_str());
         let mut dest = OsString::from(&target);
         dest.push("/");
         dest.push(file.as_os_str());
-        fs::copy(src, dest).unwrap();
+        let src_name = src.to_str().unwrap();
+        let metadata = fs::metadata(OsString::from(&src))
+            .unwrap_or_else(|_| panic!("unable to query {src_name}"));
+        if metadata.is_file() {
+            fs::copy(src, dest).unwrap();
+        } else if metadata.is_dir() {
+            save_template(src.to_str().unwrap(), dest.to_str().unwrap())
+        }
     }
 }
 
@@ -107,6 +115,11 @@ pub fn use_template(template: &str, target: &str, context_file: Option<Option<St
         tera.render_to(entry, &context, file)
             .expect("failed to render");
     }
+}
+
+pub fn print_config() {
+    let config = get_config();
+    println!("{config:?}");
 }
 
 #[cfg(test)]
